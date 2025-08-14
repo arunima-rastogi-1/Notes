@@ -1,6 +1,6 @@
 # Notes
 
-1. What is POM in Selenium, and why do we use it?
+# 1. What is POM in Selenium, and why do we use it?
 
 Answer:
 Page Object Model (POM) is a design pattern that creates an object repository for web elements. It improves code maintainability and reusability.
@@ -43,7 +43,7 @@ Code Snippet (With PageFactory):
 
 @FindBy(id = "username") WebElement username;
 
-3. How do you handle dynamic web elements?
+# 3. How do you handle dynamic web elements?
 
 Answer:
 By using XPath/CSS with dynamic attributes or partial matching.
@@ -54,7 +54,7 @@ WebElement element = driver.findElement(
     By.xpath("//input[contains(@id, 'user')]")
 );
 
-4. How do you handle dropdowns in Selenium?
+# 4. How do you handle dropdowns in Selenium?
 
 Answer:
 Using the Select class.
@@ -64,7 +64,7 @@ Code Snippet:
 Select country = new Select(driver.findElement(By.id("country")));
 country.selectByVisibleText("India");
 
-5. How do you implement explicit waits?
+# 5. How do you implement explicit waits?
 
 Answer:
 Explicit waits wait until a condition is met.
@@ -74,7 +74,7 @@ Code Snippet:
 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
 
-6. How do you handle multiple windows in Selenium?
+# 6. How do you handle multiple windows in Selenium?
 
 Answer:
 Store parent window handle, switch to child.
@@ -88,7 +88,7 @@ for (String win : driver.getWindowHandles()) {
 // Switch back
 driver.switchTo().window(parent);
 
-7. How do you upload a file in Selenium?
+# 7. How do you upload a file in Selenium?
 
 Answer:
 Directly send the file path to <input type="file">.
@@ -97,7 +97,7 @@ Code Snippet:
 
 driver.findElement(By.id("upload")).sendKeys("C:\\path\\file.txt");
 
-8. How do you handle alerts in Selenium?
+# 8. How do you handle alerts in Selenium?
 
 Answer:
 Use driver.switchTo().alert().
@@ -107,7 +107,7 @@ Code Snippet:
 Alert alert = driver.switchTo().alert();
 alert.accept(); // or alert.dismiss();
 
-9. How do you take screenshots in Selenium?
+# 9. How do you take screenshots in Selenium?
 
 Answer:
 Use TakesScreenshot interface.
@@ -117,7 +117,7 @@ Code Snippet:
 File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 Files.copy(src.toPath(), new File("screenshot.png").toPath());
 
-10. How do you run Selenium tests in parallel?
+# 10. How do you run Selenium tests in parallel?
 
 Answer:
 Use TestNG’s parallel attribute in XML.
@@ -128,7 +128,7 @@ Code Snippet (testng.xml):
     <test name="Test1">...</test>
 </suite>
 
-11. How do you scroll in Selenium?
+# 11. How do you scroll in Selenium?
 
 Answer:
 Using JavaScript Executor.
@@ -138,7 +138,7 @@ Code Snippet:
 JavascriptExecutor js = (JavascriptExecutor) driver;
 js.executeScript("window.scrollBy(0,500)");
 
-12. How do you perform mouse hover?
+# 12. How do you perform mouse hover?
 
 Answer:
 Using Actions class.
@@ -149,7 +149,7 @@ Actions actions = new Actions(driver);
 WebElement menu = driver.findElement(By.id("menu"));
 actions.moveToElement(menu).perform();
 
-13. How do you perform drag-and-drop?
+# 13. How do you perform drag-and-drop?
 
 Answer:
 Using Actions class.
@@ -159,7 +159,7 @@ Code Snippet:
 Actions actions = new Actions(driver);
 actions.dragAndDrop(source, target).perform();
 
-14. How do you handle stale element exceptions?
+# 14. How do you handle stale element exceptions?
 
 Answer:
 Re-locate the element after DOM changes.
@@ -173,7 +173,7 @@ try {
     element.click();
 }
 
-15. How do you run headless tests in Selenium?
+# 15. How do you run headless tests in Selenium?
 
 Answer:
 Use ChromeOptions.
