@@ -346,13 +346,3 @@ selenium-hub:
   ports:
     - "4444:4444"
 
-# 30. How do you wait for AJAX calls to finish in Selenium?
-
-Answer:
-Use JavaScript to check active jQuery calls.
-
-Code Snippet:
-
-WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-wait.until(driver -> ((Long)((JavascriptExecutor) driver)
-    .executeScript("return jQuery.active") == 0));
