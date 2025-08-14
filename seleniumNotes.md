@@ -26,7 +26,7 @@ public class LoginPage {
     }
 }
 
-2. Difference between POM and Page Factory?
+# 2. Difference between POM and Page Factory?
 
 Answer:
 
