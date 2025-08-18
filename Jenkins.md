@@ -1,14 +1,17 @@
 #Jenkins notes:
 
+Example #1. 
+-------------------
 
-
-    pipeline {
+pipeline {
     agent any
+
     environment {
-        JAVA_HOME = '/opt/apache-jmeter-5.6.3' // Update path as needed
-        MAVEN_HOME = 'tests/sample_test.jmx'  // Path to your JMeter script
+        JAVA_HOME   = '/opt/apache-jmeter-5.6.3' // Update path as needed
+        MAVEN_HOME  = 'tests/sample_test.jmx'    // Path to your JMeter script
         RESULTS_DIR = 'results'
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -17,7 +20,12 @@
         }
         stage('Install Dependencies') {
             steps {
-                sh 'mvn clean install -U -DskipTests -s settings.xml -Djavax.net.ssl.trustStore=nexus.jks -Djavax.net.ssl.trustStorePassword=changeit'
+                sh '''
+                    mvn clean install -U -DskipTests \
+                    -s settings.xml \
+                    -Djavax.net.ssl.trustStore=nexus.jks \
+                    -Djavax.net.ssl.trustStorePassword=changeit
+                '''
             }
         }
         stage('Run Selenium Tests') {
@@ -38,6 +46,7 @@
             }
         }
     }
+
     post {
         success {
             echo 'Pipeline completed successfully!'
@@ -47,6 +56,11 @@
         }
     }
 }
+
+Example 2:
+------------------
+
+
 
 
 
