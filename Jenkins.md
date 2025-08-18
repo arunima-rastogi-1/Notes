@@ -1,31 +1,37 @@
-#Jenkins notes:
-
-Example #1. 
--------------------
-
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/your-org/your-selenium-project.git', description: 'Git repository URL')
+        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Branch to checkout')
+        string(name: 'JMETER_HOME', defaultValue: '/opt/apache-jmeter-5.6.3', description: 'Path to JMeter Home')
+        string(name: 'JMETER_SCRIPT', defaultValue: 'tests/sample_test.jmx', description: 'Path to JMeter script')
+        string(name: 'RESULTS_DIR', defaultValue: 'results', description: 'Results directory')
+        string(name: 'MVN_SETTINGS', defaultValue: 'settings.xml', description: 'Maven settings file')
+        string(name: 'MVN_TRUSTSTORE', defaultValue: 'nexus.jks', description: 'TrustStore for Maven')
+        string(name: 'MVN_TRUSTSTORE_PASSWORD', defaultValue: 'changeit', description: 'TrustStore password')
+    }
+
     environment {
-        JAVA_HOME   = '/opt/apache-jmeter-5.6.3' // Update path as needed
-        MAVEN_HOME  = 'tests/sample_test.jmx'    // Path to your JMeter script
-        RESULTS_DIR = 'results'
+        JAVA_HOME   = "${params.JMETER_HOME}"         // Update path as needed
+        MAVEN_HOME  = "${params.JMETER_SCRIPT}"       // Path to your JMeter script
+        RESULTS_DIR = "${params.RESULTS_DIR}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/your-org/your-selenium-project.git', branch: 'main'
+                git url: params.GIT_REPO_URL, branch: params.GIT_BRANCH
             }
         }
         stage('Install Dependencies') {
             steps {
-                sh '''
+                sh """
                     mvn clean install -U -DskipTests \
-                    -s settings.xml \
-                    -Djavax.net.ssl.trustStore=nexus.jks \
-                    -Djavax.net.ssl.trustStorePassword=changeit
-                '''
+                    -s ${params.MVN_SETTINGS} \
+                    -Djavax.net.ssl.trustStore=${params.MVN_TRUSTSTORE} \
+                    -Djavax.net.ssl.trustStorePassword=${params.MVN_TRUSTSTORE_PASSWORD}
+                """
             }
         }
         stage('Run Selenium Tests') {
@@ -57,10 +63,4 @@ pipeline {
     }
 }
 
-Example 2:
-------------------
-
-
-
-
-
+------------
