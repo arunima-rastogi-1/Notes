@@ -1,11 +1,5 @@
 #Jenkins notes:
 
-First Example:
----------------------
-
-Jenkins pipeline:
-=====================
-
 pipeline {
     agent any
     
