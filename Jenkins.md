@@ -1,8 +1,9 @@
 #Jenkins notes:
 
-pipeline {
+
+
+    pipeline {
     agent any
-    
     environment {
         JAVA_HOME = '/opt/apache-jmeter-5.6.3' // Update path as needed
         MAVEN_HOME = 'tests/sample_test.jmx'  // Path to your JMeter script
