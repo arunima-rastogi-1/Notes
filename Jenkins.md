@@ -96,4 +96,65 @@ pipeline {
     }
 }
 
----------------
+--------------- 
+Jenkinsfile attributes are the building blocks that define the pipeline’s behavior, execution environment, logic, and post-processing.
+1. pipeline
+The top-level block that defines the entire pipeline.
+2. agent
+Specifies where the pipeline or a specific stage will run (e.g., any, none, or a specific label).
+3. parameters
+Defines input parameters that can be provided when starting the pipeline (e.g., string, boolean, choice).
+4. environment
+Sets environment variables that are available to all stages or specific stages.
+5. options
+Configures various pipeline-level options (e.g., timeouts, build discarding, concurrency).
+6. triggers
+Defines how and when the pipeline should be triggered (e.g., by SCM polling, cron).
+7. stages
+Contains a sequence of stage blocks, which group steps into logical units.
+8. stage
+A block within stages that defines a named phase of the pipeline (e.g., Build, Test, Deploy).
+9. steps
+The actual commands to run in a stage (e.g., sh, echo, script, bat).
+10. tools
+Defines tools to automatically install and use (e.g., JDK, Maven).
+11. post
+Defines actions that occur after pipeline or stage execution, based on result (always, success, failure, etc.).
+12. when
+Conditional execution for stages or steps (e.g., run only on certain branches or parameters).
+13. input
+Used to pause the pipeline and wait for human input.
+
+Example:
+
+
+pipeline {
+    agent any
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
+    }
+    environment {
+        VAR = 'value'
+    }
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+    }
+    triggers {
+        pollSCM('* * * * *')
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Build successful!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
