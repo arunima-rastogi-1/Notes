@@ -63,4 +63,37 @@ pipeline {
     }
 }
 
-------------
+------------ Conditional stage execution ---------------
+
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'RUN_DEPLOY', defaultValue: false, description: 'Run the Deploy stage?')
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+            }
+        }
+        stage('Deploy') {
+            when {
+                expression {
+                    params.RUN_DEPLOY == true
+                }
+            }
+            steps {
+                echo 'Deploying...'
+            }
+        }
+    }
+}
+
+---------------
