@@ -8,7 +8,11 @@ Jenkins pipeline:
 
 pipeline {
     agent any
-
+    environment {
+        JMETER_HOME = '/opt/apache-jmeter-5.6.3' // Update path as needed
+        JMETER_SCRIPT = 'tests/sample_test.jmx'  // Path to your JMeter script
+        RESULTS_DIR = 'results'
+    }
     stages {
         stage('Checkout') {
             steps {
