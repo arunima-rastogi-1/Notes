@@ -346,6 +346,151 @@ selenium-hub:
   ports:
     - "4444:4444"
 
+## 30. How would you design a scalable Selenium test automation framework?
+**Answer:**  
+- Follow layered architecture: **Test Layer → Business Layer → Page Object Layer → Utilities**.  
+- Use **Page Object Model (POM)** with Page Factory.  
+- Integrate with **TestNG/JUnit** for reporting & execution control.  
+- Support **parallel execution** with Selenium Grid / Docker.  
+- CI/CD integration (Jenkins/GitHub Actions).  
+- Externalize test data (JSON/YAML/Excel/DB).  
 
+---
+
+## 31. What is the Page Object Model (POM) and why is it important?
+**Answer:**  
+- POM separates **test scripts from UI locators**.  
+- Each page is represented as a class with locators + methods.  
+- Promotes **reusability, maintainability, readability**.  
+- Works best with **PageFactory** for lazy element initialization.  
+
+---
+
+## 3. How do you reduce test flakiness in Selenium?
+**Answer:**  
+- Use **Explicit Waits** instead of Thread.sleep.  
+- Add **retry logic** for transient failures.  
+- Avoid absolute XPath, use stable locators.  
+- Isolate environment data dependencies.  
+- Run tests on stable environments (Docker/Selenium Grid).  
+
+---
+
+## 32. How do you implement data-driven testing in Selenium?
+**Answer:**  
+- Use external data sources (Excel, CSV, JSON, DB).  
+- TestNG `@DataProvider` or JUnit `@ParameterizedTest`.  
+```java
+@DataProvider(name="loginData")
+public Object[][] getData() {
+  return new Object[][] {
+    {"user1","pass1"}, {"user2","pass2"}
+  };
+}
+@Test(dataProvider="loginData")
+public void testLogin(String user, String pass) { ... }
+```
+
+---
+
+## 33. Explain Selenium Grid and its use in large projects.
+**Answer:**  
+- **Selenium Grid** enables parallel test execution across multiple **browsers, OS, and machines**.  
+- Uses **Hub-Node** architecture.  
+- Speeds up execution for regression suites.  
+- Now enhanced by **Selenium 4 with standalone/distributed modes**.  
+
+---
+
+## 34. How would you integrate Selenium with CI/CD pipelines?
+**Answer:**  
+- Add test execution stage in **Jenkins/GitHub Actions/Azure DevOps** pipeline.  
+- Trigger tests after build/deployment.  
+- Store results in **Allure/Extent Reports**.  
+- Parallel execution on **Dockerized Grid** for scalability.  
+
+---
+
+## 35. What are Selenium’s limitations and how do you overcome them?
+**Answer:**  
+- Cannot test non-browser apps → use **Appium** for mobile.  
+- No support for **captcha, 2FA, OTP** → mock/stub external services.  
+- Performance testing not supported → use **JMeter/Gatling**.  
+- Video/audio validation not possible → use 3rd party tools.  
+
+---
+
+## 37. How do you manage test environments in large teams?
+**Answer:**  
+- Maintain **config-driven test execution** (env, browser, URL).  
+- Use **property/YAML/JSON files** for environment setup.  
+- Implement environment-specific pipelines.  
+- Use Docker containers for isolated environments.  
+
+---
+
+## 38. What design patterns are commonly used in Selenium frameworks?
+**Answer:**  
+- **Page Object Model (POM)**  
+- **Page Factory**  
+- **Singleton** (WebDriver instance)  
+- **Factory Design Pattern** (driver initialization)  
+- **Facade Pattern** (abstract complex operations into simple APIs)  
+
+---
+
+## 39. How do you handle cross-browser testing efficiently?
+**Answer:**  
+- Use **WebDriverManager** for driver binaries.  
+- Define browser type in **config file**.  
+- Run parallel tests via **TestNG/JUnit + Grid/SauceLabs/BrowserStack**.  
+- Report failures per browser separately.  
+
+---
+
+## 40. How do you implement logging in Selenium frameworks?
+**Answer:**  
+- Use **Log4j / SLF4J** for structured logging.  
+- Store logs in files for debugging.  
+- Log test start/end, locator failures, assertions, exceptions.  
+- Integrate with reporting (Allure/Extent).  
+
+---
+
+## 41. How do you handle test reporting in enterprise projects?
+**Answer:**  
+- Use **Extent Reports / Allure Reports**.  
+- Add screenshots on failure.  
+- Integrate logs with reports.  
+- Publish reports in CI/CD pipeline.  
+
+---
+
+## 42. How do you scale Selenium tests for microservices-based applications?
+**Answer:**  
+- Write **API tests (Rest Assured)** for backend services.  
+- Run **UI + API hybrid testing**.  
+- Use service virtualization for unavailable components.  
+- Ensure tests can run independently across microservices.  
+
+---
+
+## 43. How do you optimize Selenium test execution time?
+**Answer:**  
+- Run tests in **parallel** (Grid, TestNG).  
+- Use **headless browsers** for lightweight execution.  
+- Reduce redundant navigation (reuse sessions).  
+- Avoid unnecessary waits.  
+- Prioritize **critical regression vs smoke suites**.  
+
+---
+
+## 44. How do you ensure Selenium automation is aligned with DevOps practices?
+**Answer:**  
+- Version control test code in **Git**.  
+- Run automation in CI/CD pipelines (Jenkins, GitHub Actions).  
+- Store reports & logs as artifacts.  
+- Use containerization (Docker, Kubernetes).  
+- Monitor tests continuously with dashboards (Grafana, Kibana).  
      
 
