@@ -1,3 +1,12 @@
+
+# LeetCode 1277 - Count Square Submatrices with All Ones
+
+**Problem:** Given a binary matrix, count all square submatrices that consist only of 1s.  
+
+**Idea:** Use DP where `matrix[i][j]` stores the side length of the largest square ending at `(i, j)`.  
+If `matrix[i][j] == 1`, then:  
+
+
 Count the number of square submatrices with all 1s using DP.
 
 ```java
