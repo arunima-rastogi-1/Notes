@@ -10,7 +10,7 @@ If `matrix[i][j] == 1`, then:
 Count the number of square submatrices with all 1s using DP.
 
 ```java
-class Solution {
+class Solution { 
   public int countSquares(int[][] matrix) {
     for (int i = 0; i < matrix.length; ++i)
       for (int j = 0; j < matrix[0].length; ++j)
