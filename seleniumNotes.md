@@ -493,4 +493,31 @@ public void testLogin(String user, String pass) { ... }
 - Use containerization (Docker, Kubernetes).  
 - Monitor tests continuously with dashboards (Grafana, Kibana).  
      
+## 45. How to close all windows except the currently active one 
 
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class CloseOtherWindows {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        
+        // ... open multiple windows/tabs ...
+        
+        String activeWindow = driver.getWindowHandle();
+
+        // Iterate over all open window handles
+        for (String handle : driver.getWindowHandles()) {
+            if (!handle.equals(activeWindow)) {
+                driver.switchTo().window(handle);
+                driver.close(); // Close window/tab
+            }
+        }
+
+        // Switch back to the original active window
+        driver.switchTo().window(activeWindow);
+
+        // ... continue your test or quit driver ...
+        // driver.quit(); // to close all windows and end the session
+    }
+}
