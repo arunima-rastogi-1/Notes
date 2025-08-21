@@ -5,7 +5,7 @@
 Answer:
 Page Object Model (POM) is a design pattern that creates an object repository for web elements. It improves code maintainability and reusability.
 
-Code Snippet:
+Code Snippet: 
 
 public class LoginPage {
     WebDriver driver;
