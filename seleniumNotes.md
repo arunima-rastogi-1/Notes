@@ -1,6 +1,6 @@
 # Notes
 
-# 1. What is POM in Selenium, and why do we use it? 
+# 1. What is POM in Selenium, and why do we use it?  
 
 Answer:
 Page Object Model (POM) is a design pattern that creates an object repository for web elements. It improves code maintainability and reusability.
