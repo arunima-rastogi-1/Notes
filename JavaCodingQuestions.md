@@ -20,3 +20,33 @@ class Solution {
     return Arrays.stream(matrix).flatMapToInt(Arrays::stream).sum();
   }
 }
+```
+
+# LeetCode 3195 - Find the Minimum Area to Cover All Ones I  
+
+**Problem:** Given a binary matrix, find the minimum area of a rectangle that covers all the `1`s.  
+
+**Idea:** Track the minimum and maximum row/column indices of all `1`s, then compute the rectangle area as `(maxRow - minRow + 1) * (maxCol - minCol + 1)`.  
+
+```java
+class Solution {
+  public int minimumArea(int[][] grid) {
+    int x1 = Integer.MAX_VALUE;
+    int y1 = Integer.MAX_VALUE;
+    int x2 = 0;
+    int y2 = 0;
+
+    for (int i = 0; i < grid.length; ++i)
+      for (int j = 0; j < grid[0].length; ++j)
+        if (grid[i][j] == 1) {
+          x1 = Math.min(x1, i);
+          y1 = Math.min(y1, j);
+          x2 = Math.max(x2, i);
+          y2 = Math.max(y2, j);
+        }
+
+    return (x2 - x1 + 1) * (y2 - y1 + 1);
+  }
+}
+```
+
