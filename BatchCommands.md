@@ -7,7 +7,7 @@ taskkill /F /IM chrome.exe
 
 REM Close Mozilla Firefox
 taskkill /F /IM firefox.exe
-
+ 
 REM Close Microsoft Edge
 taskkill /F /IM msedge.exe
 
