@@ -521,3 +521,223 @@ public class CloseOtherWindows {
         // driver.quit(); // to close all windows and end the session
     }
 }
+
+---
+
+### 46. Explain Page Factory and its limitations.
+**Answer:**
+- Page Factory is an implementation of Page Object Model (POM) with `@FindBy` annotations.
+- It initializes elements using `initElements(driver, this)`.
+- **Limitations:**
+  - Lazy loading sometimes causes `StaleElementReferenceException`.
+  - Not efficient for very dynamic applications.
+  - Doesn’t handle AJAX elements well compared to custom waits.
+
+---
+
+### 47. How do you handle Shadow DOM elements in Selenium?
+**Answer:**
+- Selenium WebDriver doesn’t support Shadow DOM directly.
+- Use **JavaScript Executor**:
+  ```java
+  WebElement shadowHost = driver.findElement(By.cssSelector("shadow-host"));
+  SearchContext shadowRoot = (SearchContext) ((JavascriptExecutor) driver)
+     .executeScript("return arguments[0].shadowRoot", shadowHost);
+  WebElement shadowButton = shadowRoot.findElement(By.cssSelector("button"));
+  shadowButton.click();
+
+
+### 48. What strategies do you use for handling Captchas in automation?
+
+Answer:
+
+Captchas are designed to block bots, so Selenium should not bypass them.
+
+Strategies:
+
+Ask dev team to disable captcha in test environment.
+
+Use captcha-solving APIs (e.g., 2Captcha) in rare cases.
+
+Replace captcha with a static token for automated testing.
+
+### 49. How do you handle file uploads in Selenium when input type is hidden?
+
+Answer:
+
+If input is hidden, make it visible using JS:
+
+WebElement upload = driver.findElement(By.id("fileUpload"));
+((JavascriptExecutor) driver).executeScript("arguments[0].style.display='block';", upload);
+upload.sendKeys("C:\\path\\file.txt");
+
+
+Alternatively, use Robot class or AutoIT for native dialogs.
+
+### 50. What is the difference between driver.close() and driver.quit() in Selenium?
+
+Answer:
+
+close() → Closes the current browser tab/window only.
+
+quit() → Closes all windows opened by WebDriver and ends the session.
+
+Using close() incorrectly can leave zombie driver processes.
+
+### 51. How do you test HTTPS certificate errors in Selenium?
+
+Answer:
+
+Use DesiredCapabilities / ChromeOptions:
+
+ChromeOptions options = new ChromeOptions();
+options.setAcceptInsecureCerts(true);
+WebDriver driver = new ChromeDriver(options);
+
+
+This allows navigation to sites with invalid SSL certificates.
+
+### 52. How do you handle elements inside nested iframes?
+
+Answer:
+
+Switch step by step:
+
+driver.switchTo().frame("frame1");
+driver.switchTo().frame("frame2");
+driver.findElement(By.id("submit")).click();
+driver.switchTo().defaultContent();
+
+
+Always return to defaultContent() after completing operations.
+
+### 53. How do you verify if an image is broken using Selenium?
+
+Answer:
+
+Selenium alone can’t check image validity.
+
+Use JS executor with naturalWidth:
+
+WebElement img = driver.findElement(By.xpath("//img[@id='logo']"));
+Boolean valid = (Boolean)((JavascriptExecutor)driver)
+   .executeScript("return arguments[0].complete && arguments[0].naturalWidth > 0", img);
+
+### 54. How do you execute JavaScript inside Selenium? Give examples.
+
+Answer:
+
+Use JavascriptExecutor:
+
+JavascriptExecutor js = (JavascriptExecutor) driver;
+js.executeScript("window.scrollBy(0,500)");
+js.executeScript("arguments[0].click();", element);
+
+
+Useful for clicking hidden elements, scrolling, or retrieving DOM values.
+
+### 55. How do you handle stale element reference exceptions?
+
+Answer:
+
+Causes: DOM refreshed/reloaded after locating element.
+
+Solutions:
+
+Re-locate the element before interacting.
+
+Use FluentWait to wait until element is stable.
+
+Avoid storing WebElements globally; re-find them dynamically.
+
+### 56. How do you automate drag-and-drop when Selenium’s Actions class fails?
+
+Answer:
+
+Use JavaScript drag-and-drop:
+
+String script = "function createEvent(typeOfEvent) { \
+                   var event = document.createEvent('CustomEvent'); \
+                   event.initCustomEvent(typeOfEvent, true, true, null); \
+                   event.dataTransfer = { data: {}, \
+                     setData: function(key, value){ this.data[key] = value; }, \
+                     getData: function(key){ return this.data[key]; } }; \
+                   return event; } \
+                 function dispatchEvent(element, event, transferData) { \
+                   if (transferData) { event.dataTransfer = transferData; } \
+                   element.dispatchEvent(event); } \
+                 var source = arguments[0]; \
+                 var target = arguments[1]; \
+                 var dragStartEvent = createEvent('dragstart'); \
+                 dispatchEvent(source, dragStartEvent); \
+                 var dropEvent = createEvent('drop'); \
+                 dispatchEvent(target, dropEvent, dragStartEvent.dataTransfer); \
+                 var dragEndEvent = createEvent('dragend'); \
+                 dispatchEvent(source, dragEndEvent, dropEvent.dataTransfer);";
+((JavascriptExecutor) driver).executeScript(script, sourceElement, targetElement);
+
+### 57. How do you run Selenium tests in Docker?
+
+Answer:
+
+Use Selenium Grid with Docker:
+
+Run hub:
+
+docker run -d -p 4444:4444 --name selenium-hub selenium/hub
+
+
+Run Chrome/Firefox nodes:
+
+docker run -d --link selenium-hub:hub selenium/node-chrome
+docker run -d --link selenium-hub:hub selenium/node-firefox
+
+
+Configure test with remote URL:
+
+WebDriver driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+
+### 58. How do you measure page load time using Selenium?
+
+Answer:
+
+Use JavaScript performance.timing API:
+
+long loadEventEnd = (Long) ((JavascriptExecutor) driver)
+  .executeScript("return window.performance.timing.loadEventEnd;");
+long navigationStart = (Long) ((JavascriptExecutor) driver)
+  .executeScript("return window.performance.timing.navigationStart;");
+System.out.println("Page Load Time: " + (loadEventEnd - navigationStart));
+
+### 59. How do you capture console logs in Selenium?
+
+Answer:
+
+Supported in Chrome with logging preferences:
+
+LoggingPreferences logPrefs = new LoggingPreferences();
+logPrefs.enable(LogType.BROWSER, Level.ALL);
+ChromeOptions options = new ChromeOptions();
+options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+WebDriver driver = new ChromeDriver(options);
+
+LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
+for (LogEntry entry : logs) {
+    System.out.println(entry.getMessage());
+}
+
+### 60. How do you scale Selenium tests for thousands of executions daily?
+
+Answer:
+
+Use:
+
+Selenium Grid / Cloud services (BrowserStack, SauceLabs).
+
+Dockerized Selenium with Kubernetes for orchestration.
+
+Parallel execution with TestNG/Cucumber.
+
+Integrate with CI/CD pipelines for automation.
+
+Use headless browsers for faster execution.
