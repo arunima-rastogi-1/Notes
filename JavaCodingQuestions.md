@@ -20,7 +20,7 @@ class Solution {
     return Arrays.stream(matrix).flatMapToInt(Arrays::stream).sum();
   }
 }
-```
+``` 
 
 # LeetCode 3195 - Find the Minimum Area to Cover All Ones I  
 
