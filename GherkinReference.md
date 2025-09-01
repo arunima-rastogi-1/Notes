@@ -338,6 +338,348 @@ Egenskap: Brukerinnlogging
 
 
 
+#7. Step states:
+=====================
+
+Pending:   To define a "Pending" step definition implementation in Gherkin (Cucumber)
+
+example:
+import io.cucumber.java.en.Given;
+import io.cucumber.java.PendingException;
+
+@Given("I have a pending step")
+public void i_have_a_pending_step() {
+    throw new PendingException();
+}
+
+
+
+#8.  Scenario hooks:
+===========================
+
+| Hook         | Purpose                                            |
+|--------------|----------------------------------------------------|
+| `@Before`    | Run before each scenario                           |
+| `@After`     | Run after each scenario                            |
+| `@BeforeStep`| Run before each step in every scenario             |
+| `@AfterStep` | Run after each step in every scenario              |
+| `@BeforeAll` | Run once before all scenarios (static method)      |
+| `@AfterAll`  | Run once after all scenarios (static method)       |
+
+
+Example in Java
+
+
+import io.cucumber.java.Before;
+import io.cucumber.java.After;
+import io.cucumber.java.BeforeStep;
+import io.cucumber.java.AfterStep;
+import io.cucumber.java.BeforeAll;
+import io.cucumber.java.AfterAll;
+
+public class Hooks {
+
+    @Before
+    public void beforeScenario() {
+        // Code to run before each scenario
+    }
+
+    @After
+    public void afterScenario() {
+        // Code to run after each scenario
+    }
+
+
+    @BeforeAll
+    public static void beforeAll() {
+        // Code to run once before all scenarios
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        // Code to run once after all scenarios
+    }
+}
+
+
+# Tag-Specific Hooks
+You can also make hooks conditional based on tags:
+-----------------------------------------------------
+
+@Before("@web")
+public void beforeWebScenarios() {
+    // Runs before scenarios tagged with @web
+}
+
+
+# Step hooks
+----------------
+
+Hook Name      | 	When It Runs
+---------------|---------------------------
+@BeforeStep    |	Before every step
+@AfterStep     |	After every step
+-------------------------------------------
+
+Step hooks allow you to execute code before or after each step in a scenario.
+
+In Gherkin, you do not define step hooks directly in the .feature file. Instead, step hooks are a feature of Cucumber (or similar frameworks), and are implemented in your step definition code, not in Gherkin itself.
+
+
+# Conditional hooks
+----------------------
+
+Conditional hooks allow you to execute setup/teardown code only for scenarios (or features) with specific tags, making your test runs more efficient and modular.
+
+example:
+
+import io.cucumber.java.Before;
+import io.cucumber.java.After;
+
+public class Hooks {
+
+    // Runs only before scenarios tagged with @web
+    @Before("@web")
+    public void beforeWebScenario() {
+        System.out.println("This runs before @web scenarios");
+    }
+
+    // Runs only after scenarios tagged with @api
+    @After("@api")
+    public void afterApiScenario() {
+        System.out.println("This runs after @api scenarios");
+    }
+
+    // Runs before scenarios tagged with either @smoke or @regression
+    @Before("@smoke or @regression")
+    public void beforeSmokeOrRegression() {
+        System.out.println("This runs before @smoke or @regression scenarios");
+    }
+}
+
+
+# Global hooks
+------------------
+
+@BeforeAll
+public static void beforeAll() {
+    // Runs before all scenarios
+}
+
+@AfterAll
+public static void afterAll() {
+    // Runs after all scenarios
+}
+
+
+
+# Notes:
+===================
+
+->  A feature or scenario can have as many tags as you like. Separate them with spaces:
+
+	@billing @bicker @annoy
+	Feature: Verify billing
+	....
+
+-> In Scenario Outline, you can use tags on different sets of examples like below:
+
+	Scenario Outline: Steps will run conditionally if tagged
+	  Given user is logged in
+	  When user clicks <link>
+	  Then user will be logged out
+
+	  @mobile
+	  Examples:
+	    | link                  |
+	    | logout link on mobile |
+
+  	  @desktop
+	  Examples:
+	    | link                   |
+	    | logout link on desktop |
+
+
+->  Tags Hierarchy
+
+Gherkin itself does not support true tag "hierarchies" (like parent/child relationships), you can simulate a hierarchy by strategically applying multiple tags at different levels (feature, scenario, scenario outline, and example row).
+
+example simulating tag hierarchy in gherkin:
+-----------------------------------------------
+
+@productA @smoke
+Feature: Login functionality
+
+  @ui
+  Scenario: Valid user logs in
+    Given the user is on the login page
+    When they enter correct credentials
+    Then they see the dashboard
+
+  @api @regression
+  Scenario: API login endpoint returns success
+    Given the API is available
+    When a POST request is made with correct credentials
+    Then the response is 200 OK
+
+  @ui @regression
+  Scenario Outline: Login error messages
+    Given the user is on the login page
+    When they enter invalid "<username>" and "<password>"
+    Then the error message "<message>" is shown
+
+    Examples:
+      | username | password    | message                | @invalid |
+      | user1    | wrongpass   | Invalid credentials!   | @critical |
+      |          | password123 | Username required!     |           |
+
+
+==> @productA and @smoke are applied to the feature, marking all scenarios as part of Product A smoke tests.
+==> @ui, @api, @regression, @critical, @invalid provide finer granularity at the scenario and example level.
+==> You can filter test execution using these tags, for example:
+	@smoke and @ui to run only smoke UI tests.
+	@regression and @api for regression API tests.
+
+Visualization of tags hierarchy:
+
+@productA (Feature)
+ ├── @ui (Scenario 1)
+ ├── @api, @regression (Scenario 2)
+ └── @ui, @regression (Scenario Outline)
+       └── @critical (Example row)
+
+
+==>  Running a subset of scenarios
+
+	mvn test -Dcucumber.filter.tags="@smoke and @fast"
+
+	Or an environment variable:
+	set CUCUMBER_FILTER_TAGS="@smoke and @fast"
+	mvn test
+
+==> Running a subset of scenarios with TestRunner
+	
+	@CucumberOptions(tags = "@smoke and @fast")
+
+==> Ignoring a subset of scenarios
+
+	@CucumberOptions(tags = "not @smoke")
+
+
+==>  Tags expressions
+
+@smoke @ui
+Scenario: UI smoke test
+  Given the user is on the homepage
+
+@regression @api
+Scenario: API regression test
+  Given the API is up
+
+@smoke @regression
+Scenario: Smoke and regression
+  Given everything is working
+
+@wip
+Scenario: Work in progress
+  Given something is being developed
+
+
+| **Expression**                     | **Description**                                                 | **Scenarios Run**         |
+|------------------------------------|-----------------------------------------------------------------|---------------------------|
+| `@smoke`                           | Scenarios with the `@smoke` tag                                 | 1 & 3                     |
+| `@smoke and @regression`           | Scenarios with **both** `@smoke` **and** `@regression`          | 3                         |
+| `@smoke or @regression`            | Scenarios with `@smoke` **or** `@regression`                    | 1, 2, 3                   |
+| `not @wip`                         | Scenarios **without** the `@wip` tag                            | 1, 2, 3                   |
+| `@smoke and not @ui`               | Scenarios with `@smoke` but **not** `@ui`                       | 3                         |
+| `(@smoke or @regression) and not @wip` | Scenarios with `@smoke` **or** `@regression`, but **not** `@wip` | 1, 2, 3                   |
+| `@ui or @api`                      | Scenarios with `@ui` **or** `@api`                              | 1, 2                      |
+
+
+
+#  @wip tag
+===============
+The @wip tag in Gherkin stands for Work In Progress. It’s commonly used to mark scenarios or features that are still being developed, 
+
+ex:  Marking an Entire Feature as Work In Progress
+
+@wip
+Feature: User Profile Management
+
+  Scenario: Edit profile
+    Given the user is logged in
+    When the user edits their profile information
+    Then the changes should be saved
+
+
+ex: Marking a Single Scenario as WIP
+
+Feature: Shopping Cart
+
+  @wip
+  Scenario: Remove item from cart
+    Given I have items in my cart
+    When I remove one item
+    Then the cart total should update
+
+ex: Marking a Scenario Outline as WIP
+
+Feature: User Login
+
+  @wip
+  Scenario Outline: Invalid login attempts
+    Given the user is on the login page
+    When they enter username "<username>" and password "<password>"
+    Then they see an error message
+
+    Examples:
+      | username | password  |
+      | baduser  | 12345     |
+      | admin    | wrongpass |
+
+
+ex: Marking an Example Row as WIP (Cucumber-jvm only)
+
+Feature: Payment Processing
+
+  Scenario Outline: Card payment
+    Given I enter card number "<card>"
+    When I submit payment
+    Then the payment is "<status>"
+
+    Examples:
+      | card         | status    | @wip    |
+      | 123456789012 | declined  | @wip    |
+      | 987654321098 | approved  |         |
+
+
+
+# Summary of TestRunner:
+----------------------------
+
+cucumber.ansi-colors.disabled=  # true or false. default: false
+cucumber.execution.dry-run=     # true or false. default: false
+cucumber.execution.limit=       # number of scenarios to execute (CLI only).
+cucumber.execution.order=       # lexical, reverse, random or random:[seed] (CLI only). default: lexical
+cucumber.execution.wip=         # true or false. default: false.
+cucumber.features=              # comma separated paths to feature files. example: path/to/example.feature, path/to/other.feature
+cucumber.filter.name=           # regex. example: .*Hello.*
+cucumber.filter.tags=           # tag expression. example: @smoke and not @slow
+cucumber.glue=                  # comma separated package names. example: com.example.glue
+cucumber.plugin=                # comma separated plugin strings. example: pretty, json:path/to/report.json
+cucumber.object-factory=        # object factory class name. example: com.example.MyObjectFactory
+cucumber.snippet-type=          # underscore or camelcase. default: underscore
+
+example:  For example, if you are using Maven and want to run a subset of scenarios tagged with @smoke:
+
+mvn test -Dcucumber.filter.tags="@smoke"
+
+
+
+
+
+
+
 
 
 
