@@ -94,3 +94,30 @@ SLA metrics should be agreed upon between the QA team and stakeholders at the st
 - “Context-specific” means the target should be agreed based on your API’s business requirements, expected load, and SLAs.
 - MTBF (Mean Time Between Failures) and MTTR (Mean Time to Recovery) targets depend on reliability goals; strive for high MTBF and low MTTR.
 - Number of tests executed and build integration frequency should grow with product maturity and CI/CD adoption.
+
+**target SLA** for Risk based testing metric, aligned with common industry best practices. These targets may vary based on your organization's risk appetite, domain, and maturity, but they serve as a strong baseline for most QA dashboards.
+
+
+| Metric                                 | Visualization Type      | Dashboard Position        | Target Value/Industry Standard                                |
+|----------------------------------------|-------------------------|---------------------------|---------------------------------------------------------------|
+| Risk Coverage                          | Pie/Donut Chart         | Top Left                  | ≥ 95% of identified risks are covered by test cases           |
+| Defect Detection Rate by Risk Level    | Stacked Bar Chart       | Top Center                | ≥ 85% for High-risk; ≥ 80% for Medium; ≥ 75% for Low-risk     |
+| Test Case Prioritization Coverage      | Progress Bar            | Top Right                 | ≥ 90% of prioritized test cases executed                      |
+| Risk Exposure Reduction                | Line/Waterfall Chart    | Middle Left               | ≥ 80% reduction in risk exposure by pre-release               |
+| Defect Leakage by Risk Category        | Bar/Table               | Middle Center             | ≤ 2% for High-risk; ≤ 5% for Medium/Low-risk                  |
+| Test Execution Progress vs. Risk       | Multi-line/Gantt Chart  | Middle Right              | ≥ 95% of high-risk areas completed before release             |
+| Severity Distribution                  | Stacked Bar/Pie Chart   | Bottom Left               | ≤ 5% Critical/High severity defects post-testing              |
+| Residual Risk                          | Heat Map/Bubble Chart   | Bottom Center             | ≤ 10% of initial risk score remains at release                |
+| Time to Detect High-Risk Defects       | Histogram/Box Plot      | Bottom Right              | ≤ 2 days from introduction to detection                       |
+| Test Effectiveness per Risk            | Bar Chart               | Supplementary/Details Tab | ≥ 90% effectiveness for high-risk areas                       |
+
+**Notes:**
+- Targets should be reviewed and customized for your organization's context and risk tolerance.
+- “Risk Coverage” and “Test Case Prioritization Coverage” aim for maximum coverage of high-priority and high-risk areas.
+- “Defect Leakage” and “Severity Distribution” aim to minimize post-release issues, especially in high-risk categories.
+- “Time to Detect High-Risk Defects” prioritizes rapid detection to reduce business impact.
+- “Residual Risk” helps ensure only acceptable risk levels remain at release.
+
+
+
+
