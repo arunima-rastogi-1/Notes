@@ -366,7 +366,7 @@ selenium-hub:
 
 ---
 
-## 3. How do you reduce test flakiness in Selenium?
+## 32. How do you reduce test flakiness in Selenium?
 **Answer:**  
 - Use **Explicit Waits** instead of Thread.sleep.  
 - Add **retry logic** for transient failures.  
@@ -376,7 +376,7 @@ selenium-hub:
 
 ---
 
-## 32. How do you implement data-driven testing in Selenium?
+## 33. How do you implement data-driven testing in Selenium?
 **Answer:**  
 - Use external data sources (Excel, CSV, JSON, DB).  
 - TestNG `@DataProvider` or JUnit `@ParameterizedTest`.  
@@ -393,7 +393,7 @@ public void testLogin(String user, String pass) { ... }
 
 ---
 
-## 33. Explain Selenium Grid and its use in large projects.
+## 34. Explain Selenium Grid and its use in large projects.
 **Answer:**  
 - **Selenium Grid** enables parallel test execution across multiple **browsers, OS, and machines**.  
 - Uses **Hub-Node** architecture.  
@@ -402,7 +402,7 @@ public void testLogin(String user, String pass) { ... }
 
 ---
 
-## 34. How would you integrate Selenium with CI/CD pipelines?
+## 35. How would you integrate Selenium with CI/CD pipelines?
 **Answer:**  
 - Add test execution stage in **Jenkins/GitHub Actions/Azure DevOps** pipeline.  
 - Trigger tests after build/deployment.  
@@ -411,7 +411,7 @@ public void testLogin(String user, String pass) { ... }
 
 ---
 
-## 35. What are Selenium’s limitations and how do you overcome them?
+## 36. What are Selenium’s limitations and how do you overcome them?
 **Answer:**  
 - Cannot test non-browser apps → use **Appium** for mobile.  
 - No support for **captcha, 2FA, OTP** → mock/stub external services.  
@@ -741,3 +741,46 @@ Parallel execution with TestNG/Cucumber.
 Integrate with CI/CD pipelines for automation.
 
 Use headless browsers for faster execution.
+
+### 61. Java method to detect element's visibility in Selenium 
+
+```
+public boolean isElementVisible(final By by) {
+    try {
+
+        List<WebElement> elements = driver.findElements(by);
+        if (elements.isEmpty()) {
+            return false;
+        }
+
+        WebElement element = elements.get(0);
+
+        // Check size
+        Dimension size = element.getSize();
+        if (size.getHeight() <= 0 || size.getWidth() <= 0) {
+            return false;
+        }
+
+        // Check style attributes
+        String style = element.getAttribute("style");
+        if ("display: none;".equals(style) || "visibility: hidden;".equals(style)) {
+            return false;
+        }
+
+        // Check visibility using JavaScript
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        Boolean jsVisible = (Boolean) js.executeScript(
+            "var elem = arguments[0];" +
+            "return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);",
+            element
+        );
+        return jsVisible;
+
+    } catch (Exception ex) {
+        logException(ex);
+        throw new AssertionError(WEBDRIVER_FAILED + ex.getLocalizedMessage());
+    }
+}
+```
+
+
