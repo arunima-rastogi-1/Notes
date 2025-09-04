@@ -1,4 +1,4 @@
-**SLA (Service Level Agreement) metrics** for testing projects are measurable indicators that define the expected quality, timeliness, and effectiveness of testing services provided by a QA/testing team to its clients or stakeholders. These metrics help ensure that the testing process meets agreed-upon standards and business requirements.
+**SLA (Service Level Agreement) metrics** for testing projects are measurable indicators that define the expected quality, timeliness, and effectiveness of testing services provided by a QA/testing team to its clients or stakeholders. **These metrics help ensure that the testing process meets agreed-upon standards and business requirements.**
 
 ### Common SLA Metrics for Testing Projects
 
@@ -179,4 +179,25 @@ Typical **target values** for standard Performance Testing metrics. These target
   - Measures user satisfaction; ≥ 0.95 is considered excellent.
 - **Test Run Summary:**  
   - Summarizes overall health and highlights any breaches of targets.
+
+
+**suggested target values** for each CI/CT testing metric, based on industry best practices for mature **Agile and DevOps teams**. 
+
+| Metric                        | Target Value (Suggested)           | Notes/Best Practice                                  |
+|-------------------------------|------------------------------------|------------------------------------------------------|
+| Test Execution Status         | ≥ 95% Passed                       | Most tests should pass per cycle/build                |
+| Test Execution Trend          | Upward/Stable                      | Aim for consistently increasing or stable execution   |
+| Build Success Rate            | ≥ 98%                              | High rate means stable, reliable CI/CD pipeline       |
+| Test Coverage                 | ≥ 85%                              | Varies by project; 85–90% is industry target          |
+| Defect Density                | ≤ 0.5 defects/KLOC                 | Lower is better; depends on project complexity        |
+| Time to Resolve Defects       | ≤ 2 days (Critical), ≤ 5 days (All)| Fast turnaround for defect fixing                     |
+| Flaky Test Rate               | ≤ 2%                               | Keep flaky tests to a minimum for reliability         |
+| Deployment Frequency          | ≥ 1/day (mature teams); ≥ 1/week   | Frequent, automated deployments are ideal             |
+| Lead Time for Changes         | ≤ 1 day (Elite), ≤ 1 week (Good)   | Fast delivery from code commit to production          |
+
+
+**Notes:**
+- Metrics should be tailored to team/project maturity, risk tolerance, and domain requirements.
+- Regularly review and adjust targets to support continuous improvement.
+- Visualization positions help make key metrics visible for fast decision-making.
 
