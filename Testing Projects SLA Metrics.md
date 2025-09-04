@@ -118,7 +118,7 @@ SLA metrics should be agreed upon between the QA team and stakeholders at the st
 - “Time to Detect High-Risk Defects” prioritizes rapid detection to reduce business impact.
 - “Residual Risk” helps ensure only acceptable risk levels remain at release.
 
-Here are **target values** (typical goals or benchmarks) for Security testing metrics listed below:
+Here are **target values** (typical goals or benchmarks) for **Security testing metrics** listed below:
 
 
 | Metric                             | Visualization Type         | Dashboard Position         | Target Value / KPI                            |
@@ -131,7 +131,6 @@ Here are **target values** (typical goals or benchmarks) for Security testing me
 | Vulnerabilities by Module           | Heat Map/Tree Map         | Middle Right              | No module with >30% of total vulnerabilities  |
 | Security Test Execution Status      | Gantt/Progress Bar        | Bottom Left               | 100% planned security tests executed          |
 | False Positive Rate                 | Bar Chart                 | Bottom Right              | ≤ 5% false positives                          |
-````
 
 **Notes:**
 - Targets should be adjusted based on risk, project phase, and organizational context.
@@ -140,6 +139,8 @@ Here are **target values** (typical goals or benchmarks) for Security testing me
 - For "Vulnerabilities by Module," the target is to avoid concentration of issues in any one module, indicating balanced security hygiene.
 - "Test Coverage" should include static, dynamic, SCA, and other relevant security test types.  
 - The "False Positive Rate" target keeps noise low, ensuring meaningful findings.
+
+
 
 Typical **target values** for standard Performance Testing metrics. These targets can vary by application type, business requirements, and SLAs, but the following are commonly adopted benchmarks for most web and enterprise systems:
 
@@ -178,13 +179,4 @@ Typical **target values** for standard Performance Testing metrics. These target
   - Measures user satisfaction; ≥ 0.95 is considered excellent.
 - **Test Run Summary:**  
   - Summarizes overall health and highlights any breaches of targets.
-
-
-
-
-
-
-
-
-
 
