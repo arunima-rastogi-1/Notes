@@ -118,6 +118,33 @@ SLA metrics should be agreed upon between the QA team and stakeholders at the st
 - “Time to Detect High-Risk Defects” prioritizes rapid detection to reduce business impact.
 - “Residual Risk” helps ensure only acceptable risk levels remain at release.
 
+Here are **target values** (typical goals or benchmarks) for Security testing metrics listed below:
+
+
+| Metric                             | Visualization Type         | Dashboard Position         | Target Value / KPI                            |
+|-------------------------------------|---------------------------|---------------------------|-----------------------------------------------|
+| Vulnerability Count by Severity     | Stacked Bar/Pie Chart     | Top Left                  | Critical: 0, High: ≤2, Medium: ≤5, Low: ≤10   |
+| Vulnerability Trends Over Time      | Line Chart                | Top Center                | Downward trend month-over-month               |
+| Test Coverage by Security Test Type | Horizontal Bar/Donut      | Top Right                 | ≥ 85% coverage for all major test types       |
+| Remediation Time                    | Line/Box Plot             | Middle Left               | Critical: <7 days, High: <14 days, Others: <30 days |
+| Open vs. Closed Vulnerabilities     | Donut/Progress Bar        | Middle Center             | ≥ 95% closed, ≤ 5% open                       |
+| Vulnerabilities by Module           | Heat Map/Tree Map         | Middle Right              | No module with >30% of total vulnerabilities  |
+| Security Test Execution Status      | Gantt/Progress Bar        | Bottom Left               | 100% planned security tests executed          |
+| False Positive Rate                 | Bar Chart                 | Bottom Right              | ≤ 5% false positives                          |
+````
+
+**Notes:**
+- Targets should be adjusted based on risk, project phase, and organizational context.
+- These targets help teams focus on risk reduction, remediation speed, and comprehensive coverage for secure software delivery.
+- For "Vulnerability Trends Over Time," the goal is a continuous reduction in open vulnerabilities.
+- For "Vulnerabilities by Module," the target is to avoid concentration of issues in any one module, indicating balanced security hygiene.
+- "Test Coverage" should include static, dynamic, SCA, and other relevant security test types.  
+- The "False Positive Rate" target keeps noise low, ensuring meaningful findings.
+
+
+
+
+
 
 
 
