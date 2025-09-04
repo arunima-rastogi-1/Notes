@@ -141,6 +141,46 @@ Here are **target values** (typical goals or benchmarks) for Security testing me
 - "Test Coverage" should include static, dynamic, SCA, and other relevant security test types.  
 - The "False Positive Rate" target keeps noise low, ensuring meaningful findings.
 
+Typical **target values** for standard Performance Testing metrics. These targets can vary by application type, business requirements, and SLAs, but the following are commonly adopted benchmarks for most web and enterprise systems:
+
+| Metric                     | Target Value (Typical Industry Benchmark)                   |
+|----------------------------|------------------------------------------------------------|
+| **Avg/Min/Max Response Time**  | **Avg:** ≤ 2s, **Min:** ≤ 1s, **Max:** ≤ 4s (Critical: ≤ 2s for main flows) |
+| **Throughput**                 | ≥ 100 transactions/sec (depends on system scale/goals)   |
+| **Error Rate**                 | ≤ 1% (ideally < 0.1%)                                    |
+| **Concurrent Users/Load**      | As per requirement (e.g., 500, 1000, 5000 users)—should maintain targets under load |
+| **Latency Percentiles**        | **95th:** ≤ 2.5s, **99th:** ≤ 3s                         |
+| **Resource Utilization**       | CPU ≤ 70%, Memory ≤ 75%, Disk I/O/Network ≤ 70%          |
+| **Success/Failure Breakdown**  | Success ≥ 99%, Failure ≤ 1%                              |
+| **Apdex Score**                | ≥ 0.95 (Excellent), ≥ 0.85 (Good), < 0.7 (Poor)          |
+| **Test Run Summary**           | All KPIs meet/exceed targets; no critical failures       |
+
+---
+
+### Notes:
+
+- **Avg/Min/Max Response Time:**  
+  - Critical business transactions should be ≤ 2 seconds on average.
+  - Max values should not show spikes above 4 seconds for core scenarios.
+- **Throughput:**  
+  - Depends on expected production load; set according to business volume.
+- **Error Rate:**  
+  - Any error rate above 1% should trigger investigation.
+- **Concurrent Users/Load:**  
+  - Should be defined by business and scalability goals.
+- **Latency Percentiles:**  
+  - Most users (95th percentile) should see fast responses; tail latency (99th) should be monitored for outliers.
+- **Resource Utilization:**  
+  - Infrastructure should not be saturated; keep buffers for scaling.
+- **Success/Failure Breakdown:**  
+  - High success rates indicate stability; failure types should be tracked.
+- **Apdex Score:**  
+  - Measures user satisfaction; ≥ 0.95 is considered excellent.
+- **Test Run Summary:**  
+  - Summarizes overall health and highlights any breaches of targets.
+
+
+
 
 
 
