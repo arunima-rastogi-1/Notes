@@ -783,4 +783,388 @@ public boolean isElementVisible(final By by) {
 }
 ```
 
+## 62 .Get and Set a String with Base64 encoding
+
+```
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+public class Source {
+
+    private static String encodedString;
+
+    private Source() {
+        // Prevent instantiation
+    }
+
+    // Set and encode the input string with Base64
+    public static void setEncodedString(String input) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        encodedString = encoder.encodeToString(input.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // Get and decode the Base64 string
+    public static String getDecodedString() {
+        if (encodedString == null) {
+            return null;
+        }
+        Base64.Decoder decoder = Base64.getDecoder();
+        byte[] decodedBytes = decoder.decode(encodedString);
+        return new String(decodedBytes, StandardCharsets.UTF_8);
+    }
+
+    // Validate if the decoded string matches the input string
+    public static boolean validateDecodedMatchesOriginal(String original) {
+        String decoded = getDecodedString();
+        if (decoded == null) {
+            return false;
+        }
+        return decoded.equals(original);
+    }
+
+    // Getter for the encoded string (optional)
+    public static String getEncodedString() {
+        return encodedString;
+    }
+}
+```
+
+
+## 63. Select an element via CSS selector:
+-----------------------------------------
+```
+public void clickCssElement(String cssLocator) {
+    try {
+        JavascriptExecutor js = (JavascriptExecutor) driver; // Assuming 'driver' is your WebDriver instance
+        String script = "var elem = document.querySelector(arguments[0]); if(elem){elem.click();} else {throw 'Element not found: ' + arguments[0];}";
+        js.executeScript(script, cssLocator);
+    } catch (Exception ex) {
+        logException(ex);
+        throw new AssertionError(WEBDRIVER_FAILED + ex.getLocalizedMessage());
+    }
+}
+```
+
+## 64. click at centre of an element after checking element is visible on screen and trying to scroll to it before click
+-------------------------------------------------------------------------------------------------------------------
+
+```
+public void clickAtCenterOfElement(WebElement element) {
+    try {
+        // Scroll the element into view using JavaScript
+        JavascriptExecutor js = (JavascriptExecutor) driver; // Assume 'driver' is your WebDriver instance
+        js.executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", element);
+
+        // Check if element is displayed and enabled
+        if (element.isDisplayed() && element.isEnabled()) {
+            // Get element's position and size
+            Point location = element.getLocation();
+            Dimension size = element.getSize();
+            int centerX = location.getX() + size.getWidth() / 2;
+            int centerY = location.getY() + size.getHeight() / 2;
+
+            // Click at the center using Actions
+            new Actions(driver)
+                .moveToElement(element, size.getWidth() / 2, size.getHeight() / 2)
+                .click()
+                .perform();
+
+            // Optional: Short sleep for stability
+            Thread.sleep(200);
+        } else {
+            throw new IllegalStateException("Element not visible or not enabled for clicking.");
+        }
+    } catch (Exception ex) {
+        logException(ex);
+        throw new AssertionError(WEBDRIVER_FAILED + ex.getLocalizedMessage());
+    }
+}
+```
+
+
+## 65. Scroll to bottom right most corner of a web page in Selenium Java
+-------------------------------------------------------------------------
+
+```
+public void scrollToEndAndRightOfPage() {
+    try {
+        JavascriptExecutor js = (JavascriptExecutor) driver; // Assume 'driver' is your WebDriver instance
+        // Scroll to the bottom and far right of the page
+        js.executeScript(
+            "window.scrollTo(" +
+            "(document.body.scrollWidth || document.documentElement.scrollWidth), " + // X: rightmost
+            "(document.body.scrollHeight || document.documentElement.scrollHeight)" + // Y: bottom
+            ");"
+        );
+        Thread.sleep(100); // Optional stability wait
+    } catch (Exception ex) {
+        logException(ex);
+        throw new AssertionError(WEBDRIVER_FAILED + ex.getLocalizedMessage());
+    }
+}
+```
+
+scroll to centre of page:
+---------------------------
+
+```
+public void scrollToCenterOfPage() {
+    try {
+        JavascriptExecutor js = (JavascriptExecutor) driver; // Assume 'driver' is your WebDriver instance
+        // Calculate the center coordinates for X and Y
+        String script =
+            "var x = (document.body.scrollWidth || document.documentElement.scrollWidth) / 2;" +
+            "var y = (document.body.scrollHeight || document.documentElement.scrollHeight) / 2;" +
+            "window.scrollTo(x, y);";
+        js.executeScript(script);
+        Thread.sleep(100); // Optional: stability wait
+    } catch (Exception ex) {
+        logException(ex);
+        throw new AssertionError(WEBDRIVER_FAILED + ex.getLocalizedMessage());
+    }
+}
+```
+
+
+## 66. Highlight and change background of an element in Selenium (before interacting with it)
+==========================================================================================
+```
+public void highlightElementRedBackground(WebElement element) {
+    try {
+        JavascriptExecutor js = (JavascriptExecutor) driver; // Assume 'driver' is your WebDriver instance
+        // Set red background and yellow border for visibility
+        js.executeScript(
+            "arguments[0].style.background='red'; arguments[0].style.border='2px solid yellow';",
+            element
+        );
+        // You can add interaction after highlighting, e.g. click:
+        // element.click();
+    } catch (Exception ex) {
+        logException(ex);
+        throw new AssertionError(WEBDRIVER_FAILED + ex.getLocalizedMessage());
+    }
+}
+```
+
+
+## 67. Save a webpage as PDF in selenium Java
+==============================================
+
+```
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import org.apache.commons.io.FileUtils;
+
+public class PdfUtils {
+
+    private PdfUtils() {
+        // Prevent instantiation
+    }
+
+    public static void saveWebPageAsPdf(String pageUrl) {
+        String fileName = "santander" + timeStamp() + ".pdf";
+        File file = getFilePath(fileName);
+        try {
+            // Use Chrome's "print to PDF" capability via Selenium
+            // Navigate to the desired page
+            driver.get(pageUrl);
+
+            // Cast driver to ChromeDriver and use DevTools, if available
+            if (driver instanceof ChromeDriver chromeDriver) {
+                var devTools = chromeDriver.getDevTools();
+                devTools.createSession();
+                var printToPdf = devTools.send(org.openqa.selenium.devtools.v85.page.Page.printToPDF());
+                byte[] pdf = java.util.Base64.getDecoder().decode(printToPdf.getData());
+                FileUtils.writeByteArrayToFile(file, pdf);
+            } else {
+                // Fallback: Download the PDF directly from URL (if it's already a PDF)
+                URL url = new URL(pageUrl);
+                FileUtils.copyURLToFile(url, file);
+            }
+        } catch (IOException e) {
+            logException(e);
+        }
+    }
+
+    // Utility methods (implement as needed)
+    private static String timeStamp() {
+        // Return timestamp string
+        return String.valueOf(System.currentTimeMillis());
+    }
+
+    private static File getFilePath(String fileName) {
+        // Return desired file path (e.g., new File("downloads", fileName))
+        return new File("downloads", fileName);
+    }
+}
+```
+
+
+## 68. utility class for retrieving all fields (including private ones) from a Java class and its superclasses.
+==========================================================================================================
+
+```
+import com.google.common.collect.Lists;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class ClassHelper {
+
+    private ClassHelper() {
+    }
+
+    public static Iterable<Field> getFieldsFromClass(Class<?> startClass) {
+        if (startClass == null) {
+            return Collections.emptyList();
+        }
+
+        List<Field> currentClassFields = new ArrayList<>();
+        Class<?> parentClass = startClass.getSuperclass();
+
+        if (parentClass != null) {
+            List<Field> parentClassFields = (List)getFieldsFromClass(parentClass);
+            currentClassFields.addAll(parentClassFields);
+        }
+
+        currentClassFields.addAll(Lists.newArrayList(startClass.getDeclaredFields()));
+        return currentClassFields;
+    }
+}
+```
+
+
+
+## 69. To check if a **Selenium Java WebDriver instance supports the TakesScreenshot capability**, you should verify if your driver object can be cast to the TakesScreenshot interface. Most modern WebDrivers (such as ChromeDriver, FirefoxDriver, and RemoteWebDriver) support this interface, but it is good practice to check before using it.
+
+How to Check and Use TakesScreenshot
+--------------------------------------
+
+```
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+// Assume 'driver' is your WebDriver instance
+if (driver instanceof TakesScreenshot) {
+    // Now you can safely cast and take a screenshot
+    File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+    // Further actions: copy to desired location, etc.
+} else {
+    System.out.println("This WebDriver does not support taking screenshots.");
+}
+```
+
+## 70. Waits until a web page (specifically, a "decision page") is ready for interaction in a Selenium test.
+========================================================================================================
+
+The code is for robustly waiting for a page to be ready by checking a custom attribute (data-qa-page).
+
+```
+protected void waitUntilDecisionPageIsReady() {
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(100));
+    wait.pollingEvery(Duration.ofMillis(100))
+        .ignoring(StaleElementReferenceException.class)
+        .until(d -> {
+            Optional<String> pageName = getDataQaPageName();
+            return pageName.isPresent() && !"loading".equals(pageName.get());
+        });
+}
+```
+
+where:
+
+```
+	protected Optional<String> getDataQaPageName() {
+		List<WebElement> findElements = driver.findElements(By.cssSelector("[data-qa-page]"));
+		if (findElements.size() > 0) {
+			return Optional.of(findElements.get(0).getAttribute("data-qa-page"));
+		}
+		return Optional.absent();
+	}
+```
+
+
+
+## 71. write a reusable method in Selenium Java that:
+=============================================================
+
+Step 1: Injects the JavaScript code (to patch XHR/fetch and track active HTTP calls)
+
+Step 2: Returns the current value of window.activeHttpRequests (the number of active XHR/fetch requests)
+
+
+Step 1: code:
+-------------------
+```
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+
+public class XhrMonitor {
+
+    // Call this ONCE after page load to inject the script
+    public static void injectXHRMonitor(WebDriver driver) {
+        String script =
+            "window.activeHttpRequests = 0;" +
+            "(function(open, send) {" +
+            "  XMLHttpRequest.prototype.open = function() {" +
+            "    this.addEventListener('readystatechange', function() {" +
+            "      if (this.readyState === 1) window.activeHttpRequests++;" +
+            "      if (this.readyState === 4) window.activeHttpRequests--;" +
+            "    }, false);" +
+            "    open.apply(this, arguments);" +
+            "  };" +
+            "  XMLHttpRequest.prototype.send = function() {" +
+            "    send.apply(this, arguments);" +
+            "  };" +
+            "})(XMLHttpRequest.prototype.open, XMLHttpRequest.prototype.send);" +
+            "(function(fetch) {" +
+            "  window.fetch = function() {" +
+            "    window.activeHttpRequests++;" +
+            "    return fetch.apply(this, arguments)" +
+            "      .finally(() => { window.activeHttpRequests--; });" +
+            "  };" +
+            "})(window.fetch);";
+        ((JavascriptExecutor) driver).executeScript(script);
+    }
+
+    // Call this anytime to get the number of active XHR/fetch calls
+    public static Long getActiveHttpRequests(WebDriver driver) {
+        Object result = ((JavascriptExecutor) driver).executeScript(
+            "return window.activeHttpRequests;");
+        return (result instanceof Long) ? (Long) result : ((Number) result).longValue();
+    }
+}
+```
+
+Step 2: code
+----------------
+```
+WebDriver driver = new ChromeDriver();
+driver.get("https://your-site.com");
+
+// Inject the XHR monitor after page load
+XhrMonitor.injectXHRMonitor(driver);
+
+// ... perform actions that trigger XHR/fetch ...
+
+// Get active requests count at any point
+Long activeRequests = XhrMonitor.getActiveHttpRequests(driver);
+System.out.println("Active HTTP requests: " + activeRequests);
+```
+
+
+Key Points:
+
+Always inject the monitor after page load or navigation.
+Call getActiveHttpRequests() whenever you want to check the number of ongoing requests.
+## If the page reloads, inject the monitor again.
+
+
+
+
+
 
