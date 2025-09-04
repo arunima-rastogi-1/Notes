@@ -59,3 +59,38 @@
 
  
 SLA metrics should be agreed upon between the QA team and stakeholders at the start of the project and reviewed regularly for continuous improvement. They serve as a baseline for measuring and improving the quality and efficiency of testing services.
+
+
+### API Test Metrics SLA
+
+**typical target values/benchmarks for API testing metrics**, based on industry best practices and quality expectations:
+
+| Metric                        | Target/Benchmark           | Notes/Comments                                  |
+|-------------------------------|----------------------------|-------------------------------------------------|
+| **Endpoint Coverage**         | 100%                       | All production endpoints should be tested       |
+| **Method Coverage**           | 100%                       | All supported HTTP methods per endpoint         |
+| **Parameter Coverage**        | >80%                       | High coverage for input combinations            |
+| **Number of Tests Executed**  | No fixed target            | Should increase with API complexity             |
+| **Pass/Fail Rate**            | >95% pass                  | Indicates overall quality, aim for near 100%    |
+| **Defect Density**            | <0.5 defects/endpoint/1kLoC| Lower is better; ideally zero                   |
+| **Response Time (Avg)**       | <500ms                     | Varies by business needs, <200ms is optimal     |
+| **Throughput**                | Context-specific           | Set based on API type, e.g., >1000 req/sec      |
+| **Error Rate**                | <1%                        | Minimize errors; <0.1% for critical APIs        |
+| **Latency**                   | <200ms                     | Lower latency is better for user experience     |
+| **Uptime/Downtime**           | >99.9%                     | High availability; align with SLA               |
+| **MTBF**                      | As high as possible        | Higher = more reliability                       |
+| **MTTR**                      | As low as possible         | Lower = faster recovery from failures           |
+| **Vulnerability Detection**   | 0                          | No vulnerabilities ideally                      |
+| **Auth Coverage**             | 100%                       | All auth scenarios tested                       |
+| **Regression Defects**        | 0                          | No new/recurring defects after updates          |
+| **Automation Rate**           | >80%                       | Higher automation increases efficiency          |
+| **Build Integration**         | Context-specific           | Frequent test runs per CI/CD cycle              |
+| **Data Validity**             | 100%                       | All responses must be correct/valid             |
+| **Schema Validation Errors**  | 0                          | All responses conform to schema                 |
+| **Documentation Coverage**    | 100%                       | All endpoints documented and up-to-date         |
+| **Documentation Defects**     | 0                          | No issues in API documentation                  |
+
+**Notes:**
+- “Context-specific” means the target should be agreed based on your API’s business requirements, expected load, and SLAs.
+- MTBF (Mean Time Between Failures) and MTTR (Mean Time to Recovery) targets depend on reliability goals; strive for high MTBF and low MTTR.
+- Number of tests executed and build integration frequency should grow with product maturity and CI/CD adoption.
