@@ -20,4 +20,59 @@ done
 exit $exitCode
 ```
 
+## The script is a Maven build automation wrapper for a Java (probably Spring Boot) project.
+It performs (in order):
+
+	Clean (delete old build artifacts)
+	Unit Testing
+	Packaging (build a deployable jar/war)
+	with options to skip or modify each step using command-line flags.
+
+
+````
+#!/bin/bash
+set -e
+
+BASE_DIR="$(cd "$(dirname "$0")"; pwd)";
+
+RELEASE="${RELEASE:-1.0.0-SNAPSHOT}";
+MAVEN_FLAGS=""
+
+if [[ " $* " = *" --no-colour "* ]]; then
+  MAVEN_FLAGS="${MAVEN_FLAGS} -B";
+fi;
+
+# Clean
+if ! [[ " $* " = *" --skip-clean "* ]]; then
+  mvn clean \
+    ${MAVEN_FLAGS} \
+    -Drevision="$RELEASE" \
+    -f "$BASE_DIR/pom.xml";
+fi;
+
+# Unit Test
+if ! [[ " $* " = *" --skip-tests "* || " $* " = *" --skip-unit-tests "* ]]; then
+  echo "============ RUNNING UNIT TESTS";
+
+  mvn test \
+    ${MAVEN_FLAGS} \
+    -Drevision="$RELEASE" \
+    -f "$BASE_DIR/pom.xml";
+fi;
+
+if ! [[ " $* " = *" --skip-package "* ]]; then
+  echo "============ RUNNING PACKAGE";
+
+  # Package as Spring Boot app
+  mvn package spring-boot:repackage \
+    ${MAVEN_FLAGS} \
+    -Drevision="$RELEASE" \
+    -DskipTests \
+    -f "$BASE_DIR/pom.xml";
+fi;
+
+echo "All stages succeeded";
+
+````
+
 
