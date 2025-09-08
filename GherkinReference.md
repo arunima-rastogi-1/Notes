@@ -674,6 +674,663 @@ example:  For example, if you are using Maven and want to run a subset of scenar
 
 mvn test -Dcucumber.filter.tags="@smoke"
 
+In Cucumber BDD step definitions, several variables and objects are accessible, either directly via method parameters, by injection, or through the Cucumber API. Here are the most commonly available variables inside a step definition (StepDef):
+
+#  1. Scenario Object
+- Type: `io.cucumber.java.Scenario`
+- How: You can inject it as a parameter in any step definition or hook (`@Before`, `@After`).
+- Provides:  
+  - `scenario.getName()` → Scenario Name  
+  - `scenario.getId()` → Scenario ID  
+  - `scenario.getStatus()` → Execution status  
+  - `scenario.write()` / `scenario.log()` → Write/log output  
+  - `scenario.attach()` → Attach files or screenshots  
+  - Tags assigned to the scenario
+
+#  2. Tags
+- How:  
+  - `scenario.getSourceTagNames()` — returns tags for the current scenario
+
+#  Example Step Definition
+```
+    @Given("user logs in with username {string} and password {string}")
+    public void userLogsIn(String username, String password, Scenario scenario) {
+        // Print the scenario name
+        System.out.println("Scenario Name: " + scenario.getName());
+
+        // Print the scenario tags
+        System.out.println("Scenario Tags: " + scenario.getSourceTagNames());
+
+        // Get all tags for this scenario
+        Collection<String> tags = scenario.getSourceTagNames();
+
+        // Print each tag
+        System.out.println("Scenario Tags:");
+        for (String tag : tags) {
+            System.out.println(tag);
+        }
+
+        // Print the scenario status
+        System.out.println("Scenario Status: " + scenario.getStatus());
+
+        // Print step arguments
+        System.out.println("Username: " + username);
+        System.out.println("Password: " + password);
+
+        // Example: Write a message to the scenario report (visible in Cucumber HTML report)
+        scenario.log("Attempting login with username: " + username);
+
+        // Here, add your login logic, e.g. interacting with UI or API:
+        // loginPage.login(username, password);
+
+        // Attach screenshot to Cucumber report
+	byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+        scenario.attach(screenshot, "image/png", "Login Screenshot");
+        scenario.log("Login attempted with username: " + username);
+    }
+```
+
+Another Example:
+
+```
+    @Given("the user is on the login page")
+    public void the_user_is_on_the_login_page(Scenario scenario) {
+        // scenario.getId() typically returns: "features/login.feature:10"
+        String scenarioId = scenario.getId();
+        String[] parts = scenarioId.split(":");
+        String lineNumber = parts[parts.length - 1]; // Get the last part as line number
+        System.out.println("Scenario starts at line: " + lineNumber);
+    }
+
+```
+
+#  3. DataTable
+- Type: `io.cucumber.datatable.DataTable`
+- How: Pass as a step method parameter if your scenario uses a data table.
+- Provides:  
+  - Tabular data from the feature file step  
+  - Methods to convert to `List`, `Map`, etc.
+
+#  4. Feature Name
+- How: Not directly available through the standard API, but you can extract it:
+  - From the scenario ID (`scenario.getId()`), which contains the feature file name.
+  - Custom parsing or third-party libraries can give direct access.
+
+### find and print the Feature Name using Java reflection (assuming you have the Scenario object injected into your step/hook):
+
+```
+import io.cucumber.java.Scenario;
+
+public void printFeatureName(Scenario scenario) {
+    try {
+        // Get the class of the scenario object
+        Class<?> scenarioClass = scenario.getClass();
+
+        // Access the private field "scenario" inside cucumber.runtime.Scenario
+        java.lang.reflect.Field scenarioField = scenarioClass.getDeclaredField("scenario");
+        scenarioField.setAccessible(true);
+        Object cucumberScenario = scenarioField.get(scenario);
+
+        // Access the private field "uri" which has the feature file path
+        java.lang.reflect.Field uriField = cucumberScenario.getClass().getDeclaredField("uri");
+        uriField.setAccessible(true);
+        Object uri = uriField.get(cucumberScenario);
+
+        // The feature file name is the last segment of the URI
+        String featureFilePath = uri.toString();
+        String featureName = featureFilePath.substring(featureFilePath.lastIndexOf('/') + 1);
+
+        System.out.println("Feature Name: " + featureName);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+```
+
+Sample usage for above:
+
+```
+@Given("some step")
+public void someStep(Scenario scenario) {
+    printFeatureName(scenario);
+}
+```
+
+### Alternative (No Reflection)
+
+```
+String scenarioId = scenario.getId();
+String featureName = scenarioId.split(":")[0]; // Typically the feature file path
+System.out.println("Feature Name: " + featureName);
+```
+
+This is safer and works with Cucumber-JVM >= 4.
+
+
+#  5. Step Name / Step Text
+- How:  
+  - You usually have access to the current step’s text via the step definition pattern (the string inside the `@Given`, `@When`, etc).
+  - The Scenario API does not directly provide the step text.
+
+
+```
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.But;
+
+import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
+
+// Utility class to scan and print Cucumber step definitions
+public class StepDefinitionScanner {
+
+    // Pass your step definition class here
+    public static void printStepNamesAndTexts(Class<?> stepDefClass) {
+        for (Method method : stepDefClass.getDeclaredMethods()) {
+            for (Annotation annotation : method.getAnnotations()) {
+                String stepType = null;
+                String stepText = null;
+
+                if (annotation instanceof Given) {
+                    stepType = "Given";
+                    stepText = ((Given) annotation).value();
+                } else if (annotation instanceof When) {
+                    stepType = "When";
+                    stepText = ((When) annotation).value();
+                } else if (annotation instanceof Then) {
+                    stepType = "Then";
+                    stepText = ((Then) annotation).value();
+                } else if (annotation instanceof And) {
+                    stepType = "And";
+                    stepText = ((And) annotation).value();
+                } else if (annotation instanceof But) {
+                    stepType = "But";
+                    stepText = ((But) annotation).value();
+                }
+
+                if (stepType != null) {
+                    System.out.println("Step Type: " + stepType);
+                    System.out.println("Step Text: " + stepText);
+                    System.out.println("Method: " + method.getName());
+                    System.out.println("---------------------------");
+                }
+            }
+        }
+    }
+}
+```
+
+```
+// Sample usage of above:  
+Suppose your stepdef class is UserLoginStepDef
+StepDefinitionScanner.printStepNamesAndTexts(UserLoginStepDef.class);
+
+```
+
+
+#  6. Step Arguments
+- How:  
+  - As method parameters in your step definition (e.g., numbers, strings, etc. from regex capture groups).
+
+```
+    @Given("user logs in with username {string} and password {string}")
+    public void userLogsIn(String username, String password, Scenario scenario) {
+
+        try {
+            Method method = this.getClass().getMethod("userLogsIn", String.class, String.class, Scenario.class);
+            Parameter[] parameters = method.getParameters();
+
+            for (int i = 0; i < parameters.length; i++) {
+                System.out.println("Parameter Name: " + parameters[i].getName());
+                System.out.println("Parameter Type: " + parameters[i].getType().getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+```
+
+
+
+
+
+#  Summary Table
+
+| Variable               | How to Access                       | Available in StepDef | Notes                         |
+|------------------------|-------------------------------------|----------------------|-------------------------------|
+| Scenario Name          | `scenario.getName()`                | Yes                  | Inject Scenario object        |
+| Scenario Tags          | `scenario.getSourceTagNames()`      | Yes                  | Inject Scenario object        |
+| Scenario ID            | `scenario.getId()`                  | Yes                  | Includes feature file name    |
+| Scenario Status        | `scenario.getStatus()`              | Yes                  | Inject Scenario object        |
+| DataTable              | Step parameter                      | Yes (if used)        | Only for steps with DataTable |
+| Feature Name           | Parse from Scenario ID              | Yes (indirect)       | No direct API                 |
+| Step Arguments         | Step method parameters              | Yes                  | Regex capture groups          |
+
+
+Note:  
+- The `Scenario` object is the main gateway to scenario-level info.
+- DataTable is only present if your step uses it.
+- Feature name requires parsing or custom hooks.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+# Scenario injection in StepDef
+
+To inject the Scenario object into your step definition or hook in Cucumber BDD with Selenium Java, you simply add it as a method parameter. Cucumber will inject the current scenario automatically at runtime.
+
+example:
+
+```
+import io.cucumber.java.en.Given;
+import io.cucumber.java.Scenario;
+
+public class LoginStepDef {
+    @Given("user logs in")
+    public void user_logs_in(Scenario scenario) {
+        // You can use scenario.getName(), scenario.log(), etc.
+        System.out.println("Scenario Name: " + scenario.getName());
+    }
+}
+```
+
+# Injecting Scenario in Hooks (@Before, @After)
+
+```
+import io.cucumber.java.Before;
+import io.cucumber.java.After;
+import io.cucumber.java.Scenario;
+
+public class Hooks {
+
+    @Before
+    public void beforeScenario(Scenario scenario) {
+        System.out.println("Starting Scenario: " + scenario.getName());
+    }
+
+    @After
+    public void afterScenario(Scenario scenario) {
+        System.out.println("Finished Scenario: " + scenario.getName());
+    }
+}
+```
+
+
+===
+
+How to use the `@Transpose` annotation in **Cucumber BDD API (Java)** with a DataTable.  
+The `@Transpose` annotation is used to **transpose rows and columns** in a DataTable so that you can easily map single-column or single-row tables to objects or lists.
+
+---
+
+### 1. **Gherkin Step with DataTable**
+
+```gherkin
+Given the user is
+    | firstname   | Roberto     |
+    | lastname    | Lo Giacco   |
+    | nationality | Italian     |
+```
+
+- This step provides user information using a **vertical table** (keys in the first column, values in the second).
+- Cucumber will pass this table to your Java step definition.
+
+---
+
+### 2. **@DataTableType Annotation**
+
+```java
+@DataTableType
+public User convert(Map<String, String> entry){
+    return new User(
+        entry.get("firstname"),
+        entry.get("lastname"),
+        entry.get("nationality")
+    );
+}
+```
+
+- This method tells Cucumber how to convert a row from a DataTable into a `User` object.
+- The `@DataTableType` annotation registers a custom mapping for DataTables.
+- Each entry in the table (here, the whole table) is represented as a `Map<String, String>`.
+- The method returns a new `User` object using values from the map.
+
+---
+
+### 3. **Step Definition Using @Transpose**
+
+```java
+@Given("^the user is$")
+public void the_user_is(@Transpose User user) {
+    this.user = user;
+}
+```
+
+- The `@Transpose` annotation **flips the table** so that it can be mapped as a single row (even though the table is vertical).
+- Cucumber uses the registered `@DataTableType` to convert the table into a `User` object and injects it into the step.
+- You can now use the populated `user` object in your test.
+
+---
+
+### 4. **How It Works Together**
+
+- When the scenario runs, Cucumber sees the vertical user table and the step.
+- Because you have a `@DataTableType` method for `User`, and use `@Transpose` in your step, Cucumber:
+  1. Transposes the table so it matches the expected mapping.
+  2. Converts it to a `Map<String, String>`.
+  3. Uses your converter to return a `User` object.
+  4. Passes the `User` object to your step method.
+
+---
+
+### **Summary Table**
+
+| Part              | Purpose                                                        |
+|-------------------|---------------------------------------------------------------|
+| Gherkin table     | Defines user details in vertical format                        |
+| @DataTableType    | Converts table map to a User object                            |
+| @Transpose        | Flips table orientation to match mapping needs                 |
+| Step definition   | Receives `User` object, ready for use in test logic            |
+
+---
+
+**In short:**  
+This pattern lets you write readable feature files, and have Cucumber automatically convert tabular data into rich Java objects for your tests, using custom mapping logic and the `@Transpose` annotation for orientation.
+
+
+===
+
+@DocString annotation
+------------------------
+
+Use `@DocStringType` to define a function that transforms a DocString into a custom Java object, making it easy to work with multi-line data in Cucumber steps.
+
+The `@DocStringType` annotation in Cucumber BDD Java is used to define a custom transformation for [DocStrings](https://cucumber.io/docs/cucumber/cucumber-expressions/#doc-string) in Gherkin steps.  
+A DocString is a multi-line string literal you can pass to steps.
+
+---
+
+## **1. Gherkin Feature Example**
+
+```gherkin
+Feature: DocString Example
+
+  Scenario: Process JSON DocString
+    Given the payload is:
+      """
+      {
+        "name": "Roberto",
+        "age": 32
+      }
+      """
+```
+
+---
+
+## **2. Step Definition with `@DocStringType`**
+
+```java name=DocStringStepDef.java
+import io.cucumber.java.en.Given;
+import io.cucumber.java.DocStringType;
+
+public class DocStringStepDef {
+
+    public static class Payload {
+        public String name;
+        public int age;
+    }
+
+    // Custom transformer for JSON DocStrings
+    @DocStringType
+    public Payload transformPayload(String docString) {
+        // Very basic parsing for demonstration; use a proper JSON library in production!
+        Payload payload = new Payload();
+        docString = docString.replace("{", "").replace("}", "").replace("\"", "").trim();
+        String[] lines = docString.split("\n");
+        for (String line : lines) {
+            String[] parts = line.trim().split(":");
+            if (parts[0].trim().equals("name")) {
+                payload.name = parts[1].trim();
+            } else if (parts[0].trim().equals("age")) {
+                payload.age = Integer.parseInt(parts[1].trim());
+            }
+        }
+        return payload;
+    }
+
+    @Given("the payload is:")
+    public void the_payload_is(Payload payload) {
+        System.out.println("Name: " + payload.name);
+        System.out.println("Age: " + payload.age);
+    }
+}
+```
+
+---
+
+## **3. How It Works**
+
+- The Gherkin step passes a DocString (multi-line string).
+- Cucumber detects the `@DocStringType` transformation and applies it to the DocString before injection.
+- The step definition receives a mapped `Payload` object.
+
+---
+
+## **References**
+- [Cucumber Docs: DocStringType](https://cucumber.io/docs/cucumber/step-definitions/?lang=java#docstringtype)
+- [Cucumber Docs: DocStrings](https://cucumber.io/docs/cucumber/cucumber-expressions/#doc-string)
+
+---
+===
+
+Cucumber Expressions:
+=============================
+
+
+**Cucumber Expressions** are a more readable and flexible way to match steps to step definitions compared to regular expressions.
+
+### **Summary Cucumber Expressions**
+
+| Cucumber Expression                | Example Step                  | Parameter Type     |
+|------------------------------------|-------------------------------|--------------------|
+| `{int}`                            | I have 42 apples              | Integer            |
+| `{string}`                         | I eat "banana" fruit          | String             |
+| `{word}`                           | 5 apples should be left       | String (word)      |
+| `{boolean}`                        | the light is true             | Boolean            |
+| `{double}`                         | the price is 39.99            | Double             |
+| Custom `{date}`                    | today is 2025-09-08           | LocalDate          |
+
+---
+#1. Example:
+
+```java
+@Given("the price is {double}")
+public void the_price_is(double price) {
+    // price: 39.99
+}
+```
+**Matches:**  
+`Given the price is 39.99`
+
+---
+
+# 2. **Matching Date Parameters aka ##Custom Parameter Types
+
+Suppose you register a custom parameter type for dates:
+```java
+@ParameterType(".*")
+public LocalDate date(String date) {
+    return LocalDate.parse(date);
+}
+
+@Given("today is {date}")
+public void today_is(LocalDate date) {
+    // date: LocalDate object
+}
+```
+**Matches:**  
+`Given today is 2025-09-08`
+
+---
+
+
+# Cucumber Tags expressions
+===
+
+**Tag expressions** in Cucumber BDD are used to include or exclude scenarios or features based on their tags when running tests.  
+They allow you to filter which scenarios to execute using logical operators.
+
+---
+
+## **Common Tag Expression Examples**
+
+Assume you have the following feature file:
+
+```gherkin
+@smoke
+Feature: Login
+
+  @regression @important
+  Scenario: Valid login
+    Given the user enters valid credentials
+
+  @regression
+  Scenario: Invalid login
+    Given the user enters invalid credentials
+
+  @wip
+  Scenario: Unfinished scenario
+    Given the user tries something else
+```
+
+---
+
+### 1. **Run Scenarios With a Single Tag**
+
+
+```
+@regression
+```
+**Effect:**  
+Runs scenarios tagged with `@regression`.
+
+---
+
+### 2. **Run Scenarios With Multiple Tags (OR)**
+
+```
+@important or @wip
+```
+**Effect:**  
+Runs scenarios tagged with either `@important` **or** `@wip`.
+
+---
+
+### 3. **Run Scenarios With All Tags (AND)**
+
+```
+@regression and @important
+```
+**Effect:**  
+Runs scenarios tagged with **both** `@regression` **and** `@important`.
+
+---
+
+### 4. **Exclude Scenarios With Tag (NOT)**
+
+```
+not @wip
+```
+**Effect:**  
+Runs scenarios **not** tagged with `@wip`.
+
+---
+
+### 5. **Complex Combinations**
+
+```
+@regression and not @important
+```
+**Effect:**  
+Runs scenarios tagged with `@regression` **but not** `@important`.
+
+---
+
+## **How to Use Tag Expressions**
+
+- **JUnit Example** (Cucumber-JVM 5+):
+
+```java
+import io.cucumber.junit.CucumberOptions;
+import io.cucumber.junit.Cucumber;
+import org.junit.runner.RunWith;
+
+@RunWith(Cucumber.class)
+@CucumberOptions(
+    features = "classpath:features",
+    tags = "@regression and not @wip"
+)
+public class RunCucumberTest {}
+```
+
+- **Command Line Example:**
+```shell
+cucumber --tags "@regression and not @wip"
+```
+
+---
+
+## **Cucumber Tags Expressions**
+
+| Expression                    | Meaning                                  |
+|-------------------------------|------------------------------------------|
+| `@regression`                 | Scenarios tagged with `@regression`      |
+| `@a or @b`                    | `@a` OR `@b`                             |
+| `@a and @b`                   | BOTH `@a` AND `@b`                       |
+| `not @wip`                    | NOT tagged with `@wip`                   |
+| `@a and not @b`               | `@a` AND NOT `@b`                        |
+
+
+**References:**
+- [Cucumber Tag Expressions Docs](https://cucumber.io/docs/cucumber/api/#tag-expressions)
+
+
+
+================
+
+# Running cucumber via Maven project:
+ you can run the CLI using the Exec Maven plugin:
+
+mvn exec:java                                  \
+    -Dexec.classpathScope=test                 \
+    -Dexec.mainClass=io.cucumber.core.cli.Main \
+    -Dexec.args="/path/to/your/feature/files --glue hellocucumber --glue anotherpackage"
+
+
+
+=====================
+
+
+https://spring.io/guides
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
