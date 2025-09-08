@@ -572,5 +572,80 @@ public class MyStepDefinitions {
 Note: Using `@DirtiesContext` in combination with parallel execution will lead
 to undefined behaviour.
 
+Spring Boot with Cucumber, you often need to provide a custom Spring context for your step definitions and test configuration.  
+`@ContextConfiguration` allows you to specify annotated configuration classes to bootstrap the Spring context.
+
+---
+
+## **Example: Context Configuration with Annotated Classes in Spring Boot + Cucumber**
+
+Suppose you have a custom configuration for your tests:
+
+```java name=TestConfig.java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class TestConfig {
+    @Bean
+    public MyService myService() {
+        return new MyServiceImpl();
+    }
+}
+```
+
+Your **Cucumber runner** uses `@ContextConfiguration` to load this config:
+
+```java name=CucumberSpringContextConfiguration.java
+import io.cucumber.spring.CucumberContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+
+// This class is required for Cucumber to recognize Spring context
+@CucumberContextConfiguration
+@SpringBootTest
+@ContextConfiguration(classes = {AppConfig.class, TestConfig.class})
+public class CucumberSpringContextConfiguration {
+    // No code needed; just configuration
+}
+```
+
+Your **Step Definition** class can now autowire beans from `TestConfig`:
+
+```java name=StepDefinitions.java
+import io.cucumber.java.en.Given;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class StepDefinitions {
+
+    @Autowired
+    private MyService myService;
+
+    @Given("I call my service")
+    public void i_call_my_service() {
+        myService.doSomething();
+    }
+}
+```
+
+---
+
+## **Summary Table**
+
+| Class Name                        | Purpose                                         |
+|------------------------------------|------------------------------------------------|
+| `TestConfig`                      | Defines beans for Spring context                |
+| `CucumberSpringContextConfiguration` | Boots up Spring context for Cucumber         |
+| Step Definition                   | Uses beans via `@Autowired`                     |
+
+---
+
+**Key Points:**
+- Use `@ContextConfiguration(classes = {...})` to specify annotated config classes.
+- Use `@CucumberContextConfiguration` for Cucumber + Spring integration.
+- Use `@SpringBootTest` for full Spring Boot context (or limit with webEnvironment if needed).
+
+
+
 
 
