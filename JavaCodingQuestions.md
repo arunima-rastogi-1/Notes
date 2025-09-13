@@ -67,3 +67,45 @@ class Solution {
   }
 }
 ```
+# Leetcode 3541 - Find Most Frequent Vowel and Consonant
+
+```java
+class Solution {
+    public int maxFreqSum(String s) {
+        
+        int[] freq = new int[26];
+
+        
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            int index = ch - 'a';  
+            freq[index]++;
+        }
+
+        int maxVowel = 0;
+        int maxConsonant = 0;
+
+        
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            int count = freq[ch - 'a'];
+
+            if (isVowel(ch)) {
+                if (count > maxVowel) {
+                    maxVowel = count;
+                }
+            } else {
+                if (count > maxConsonant) {
+                    maxConsonant = count;
+                }
+            }
+        }
+
+        return maxVowel + maxConsonant;
+    }
+
+    private boolean isVowel(char c) {
+        return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
+    }
+}
+```
