@@ -1,4 +1,4 @@
- 
+  
 # LeetCode 1277 - Count Square Submatrices with All Ones     
  
 **Problem:** Given a binary matrix, count all square submatrices that consist only of 1s.   
